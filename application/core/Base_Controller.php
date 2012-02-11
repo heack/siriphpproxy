@@ -13,7 +13,11 @@ class Base_Controller extends CI_Controller
 		'form-data' => 'multipart/form-data'
 	);		
 	
-
+    private $request = NULL;
+    private $put = array();
+	private $delete = array();
+	 */
+	
 	
 	public $remote_ip_address = NULL;
 	
