@@ -1,6 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class Welcome extends Base_Controller {
+class Process extends Base_Controller {
 
 	/**
 	 * Index Page for this controller.
@@ -32,7 +32,7 @@ class Welcome extends Base_Controller {
 	{
 		$this->load->view('welcome_message');
 	}
-	public function responsto($term) {
+	public function responseto($term) {
 		$result = "hello ".$term;
 		$this->response(array('results'=>$result));		
 	}
