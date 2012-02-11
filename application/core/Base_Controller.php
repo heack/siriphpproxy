@@ -6,18 +6,6 @@ class Base_Controller extends CI_Controller
     private $output_formats = array(
 		'json' 	=> 'application/json'
     );
-
-	/*
-	// Incoming supported content types
-	private $supported_formats = array(
-		'form-data' => 'multipart/form-data'
-	);		
-	
-    private $request = NULL;
-    private $put = array();
-	private $delete = array();
-	 */
-	
 	
 	public $remote_ip_address = NULL;
 	
@@ -84,29 +72,6 @@ class Base_Controller extends CI_Controller
 
     	return 'get';
     }
-	
-	/*
-	private function detect_input_format()
-	{
-		if ($this->input->server('CONTENT_TYPE'))
-		{
-			// Check all formats against the HTTP_ACCEPT header
-			foreach ($this->supported_formats as $format => $mime)
-			{
-				if (strpos($match = $this->input->server('CONTENT_TYPE'), ';'))
-				{
-					$match = current(explode(';', $match));
-				}
-
-				if ($match == $mime)
-				{
-					return $format;
-				}
-			}
-		}
-
-		return NULL;
-	}
 	 */
 
     /**
@@ -124,22 +89,6 @@ class Base_Controller extends CI_Controller
     {
     	return $this->input->post($key, TRUE);
     }
-	
-    /**
-     *  A wrapper for HTTP PUT input
-    public function put($key)
-    {
-    	return array_key_exists($key, $this->put) ? $this->security->xss_clean($this->put[$key]) : FALSE;
-    }
-     */
-		
-    /**
-     *  A wrapper for HTTP DELETE input
-    public function delete($key)
-    {
-    	return array_key_exists($key, $this->delete) ? $this->security->xss_clean($this->delete[$key]) : FALSE;
-    }
-     */
 	
 	public function params($key)
 	{
@@ -264,35 +213,5 @@ class Base_Controller extends CI_Controller
 		$this->output->set_output($output);
     }
 	
-	/*
-	private function parse_raw_http_request()
-	{
-		$input = file_get_contents('php://input');
-
-		// get the multipart data boundry
-		preg_match('/boundary=(.*)$/', $_SERVER['CONTENT_TYPE'], $matches);
-		$boundary = $matches[1];
-
-		// split the content
-		$a_blocks = preg_split("/-+$boundary/", $input);
-		array_pop($a_blocks);
-
-		foreach ($a_blocks as $id => $block)
-		{
-			if (empty($block)) continue;
-			
-			// parse uploaded files
-			if (strpos($block, 'Content-Type:') !== FALSE)
-			{
-				preg_match("/name=\"([^\"]*)\".*Content-Type:.*?[\n|\r]+([^\n\r].*)?$/s", $block, $matches);
-			}
-			// parse data
-			else
-			{
-				preg_match('/name=\"([^\"]*)\"[\n|\r]+([^\n\r].*)?\r$/s', $block, $matches);
-			}
-			$this->put[$matches[1]] = $matches[2];
-		}        
-	}
-	 */
+	
 }
