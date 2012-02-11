@@ -13,14 +13,7 @@ class Base_Controller extends CI_Controller
 		'form-data' => 'multipart/form-data'
 	);		
 	
-    private $request = NULL;
-    private $put = array();
-	private $delete = array();
-	 */
-	const ADMIN_ACCOUNT_TYPE = 1;
-	public $account = NULL;
-	public $token = NULL;
-    public $client = NULL;
+
 	
 	public $remote_ip_address = NULL;
 	
@@ -157,63 +150,27 @@ class Base_Controller extends CI_Controller
 		}						
 	}
 	
-	/**
-	 * Check for administrator account
-	 */
-	public function is_admin($account_id)
-	{
-		$this->load->model('a3/account_model');
-		
-		if ($this->account_model->check_account_type($account_id, self::ADMIN_ACCOUNT_TYPE)) return TRUE;
-	}
+	
 			
 	/**
 	 * Check for valid oauth client credentials
 	 */
 	public function oauth_client()
 	{
-		$this->load->library('oauthserver');
 		
-		if ($this->params('client_secret'))
-		{
-			$this->client = $this->oauthserver->find_client_by_secret($this->params('client_secret'));
-		}
 	}
 
 	/**
 	 * Check for valid oauth client and resource owner credentials
 	 */
-	public function oauth_account()
-	{
-		$this->oauth_client();
-		
-		if ($this->client && $this->params('access_token'))
-		{
-			if ($this->token = $this->oauthserver->find_token_by_client_id_and_access_token($this->client->id, $this->params('access_token')))
-			{
-				$this->load->model('a3/account_model');
-				$this->account = $this->account_model->find_by_id($this->token->a3_account_id);
-			}
-		}
-	}
+	
 	
 	/**
 	 * Require a client
 	 */
 	public function require_client()
 	{
-		$this->oauth_client();
-				
-		if ( ! $this->client)
-		{
-			header("Content-Type: application/json");
-			header("Cache-Control: no-store");
-			header("HTTP/1.1 ". 403);
-			
-			// Output json and die									
-			echo json_encode(array('message' => 'Invalid oauth client credentials.'));	
-			die;						
-		}
+		
 	}
 	
 	/**
@@ -242,47 +199,7 @@ class Base_Controller extends CI_Controller
 	 */
 	private function logger($body)
 	{
-		// For PUT requests obtain paramaters from stream
-		// if ($_SERVER['REQUEST_METHOD'] == 'PUT')
-		// {
-			// parse_str(file_get_contents("php://input"), $_POST);
-		// }
 		
-		if ($this->input->get('snb_region')) $region = $this->input->get('snb_region');
-		if ($this->input->post('snb_region')) $region = $this->input->post('snb_region');
-		if (!isset($region))
-		{
-			$region = 'sg';
-		}
-		
-		$this->load->helper('date');
-		$log = array(
-			'region' => $region,
-			'http_user_agent' => isset($_SERVER['HTTP_USER_AGENT']) ? trim($_SERVER['HTTP_USER_AGENT']) : NULL,
-			'remote_addr' => $this->remote_ip_address,
-			'remote_host' => isset($_SERVER['REMOTE_HOST']) ? trim($_SERVER['REMOTE_HOST']) : NULL,
-			'request_uri' => isset($_SERVER['REQUEST_URI']) ? trim($_SERVER['REQUEST_URI']) : NULL,
-			'request_method' => isset($_SERVER['REQUEST_METHOD']) ? trim($_SERVER['REQUEST_METHOD']) : NULL,
-			'get_data' => $_GET ? json_encode($_GET) : NULL,
-			'post_data' => $_POST ? json_encode($_POST) : NULL,
-			'body_data' => $body,
-			'created_at' => mdate('%Y-%m-%d %H:%i:%s', now()),
-		);
-
- 		$this->load->library('awsphpsdk');
-		if ($this->config->item('enable_api_logging'))
-		{
-			$sqs = new AmazonSQS();
-			$sqs->set_region(AmazonSQS::REGION_APAC_SE1);
-			if ( ! $this->config->item('enable_ssl_verification')) $sqs->ssl_verification = FALSE;
-			$response = $sqs->send_message($this->config->item('aws_sqs_queue_url'), json_encode($log));
-						
-			if ( ! $response->isOK())
-			{
-				// Sue Amazon or just CRY LOUDLY...
-				log_message('error', "AWS SQS Queue Send Message Failed");
-			}
-		}
 	}
 	
 	/**
