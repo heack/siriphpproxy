@@ -72,7 +72,8 @@ class Base_Controller extends CI_Controller
 
     	return 'get';
     }
-	 */
+	
+	
 
     /**
      *  A wrapper for CI GET input
@@ -89,6 +90,22 @@ class Base_Controller extends CI_Controller
     {
     	return $this->input->post($key, TRUE);
     }
+	
+    /**
+     *  A wrapper for HTTP PUT input
+    public function put($key)
+    {
+    	return array_key_exists($key, $this->put) ? $this->security->xss_clean($this->put[$key]) : FALSE;
+    }
+     */
+		
+    /**
+     *  A wrapper for HTTP DELETE input
+    public function delete($key)
+    {
+    	return array_key_exists($key, $this->delete) ? $this->security->xss_clean($this->delete[$key]) : FALSE;
+    }
+     */
 	
 	public function params($key)
 	{
@@ -212,6 +229,5 @@ class Base_Controller extends CI_Controller
 		// send output
 		$this->output->set_output($output);
     }
-	
 	
 }
